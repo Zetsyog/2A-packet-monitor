@@ -1,38 +1,33 @@
 #include "capture/common.h"
-#include "util.h"
 #include "signal.h"
-
-static int keepRunning = 1;
+#include "parser.h"
+#include "util.h"
 
 void intHandler(int dummy) {
-	keepRunning = 0;
+	(void) dummy;
+
+	pcap_breakloop(handle);
 }
 
 void got_packet(u_char *user, const struct pcap_pkthdr *h,
 				const u_char *bytes) {
-	printf("New paquet \n");
-	int count = 0;
-	for (unsigned int i = 0; i < h->caplen; i++) {
-		printf("%x ", bytes[i]);
-		count++;
-		if (count >= 16) {
-			count = 0;
-			printf("\n");
-		}
-	}
+	(void) user;
+
+	// printf("==== Got a %d byte packet ====\n", h->len);
+	parse_ethernet(bytes);
 }
 
 void start_capture() {
-	if(pcap_loop(handle, -1, got_packet, NULL) == PCAP_ERROR) {
-
-	};
 	signal(SIGINT, intHandler);
-	while(keepRunning)
-		pcap_breakloop(handle);
+
+	int ret = pcap_loop(handle, 0, got_packet, NULL);
+
+	if (ret == PCAP_ERROR || ret == PCAP_ERROR_BREAK) {
+		pcap_perror(handle, "pcap loop");
+	}
 
 	pcap_close(handle);
 }
 
 void destroy() {
-
 }

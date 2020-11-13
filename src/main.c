@@ -5,12 +5,12 @@
 #include <unistd.h>
 #include "util.h"
 
-#define USAGE "Usage : %s [-i interface] [-o file] [-f filter] [-v <1..3>]"
+#define USAGE "Usage : %s (-i <interface>| -o <file>) [-f <filter>] [-v <1..3>]"
 
 int main(int argc, char **argv) {
 	int opt;
 	options.exec_type = NONE;
-	options.verbose_level = CONCISE;
+	options.verbose_level = COMPLETE;
 
 	while ((opt = getopt(argc, argv, "i:o:f:v:")) != -1) {
 		switch (opt) {
@@ -29,24 +29,31 @@ int main(int argc, char **argv) {
 		case 'v':
 			options.verbose_level = atoi(optarg);
 			if (options.verbose_level < 1 || options.verbose_level > 3) {
-				raler("Usage: verbose must be in range [1 - 3]");
+				log_error("usage: verbose must be in range [1 - 3]");
+				exit(EXIT_FAILURE);
 			}
 			break;
 		default:
-			raler(USAGE, argv[0]);
+			log_error(USAGE, argv[0]);
+			exit(EXIT_FAILURE);
 		}
 	}
 
 	if (optind != argc) {
-		raler("%i %i", optind, argc);
+		log_error("%i %i", optind, argc);
+		exit(EXIT_FAILURE);
 	}
+
+	set_verbosity(options.verbose_level);
 
 	if (options.exec_type == ONLINE) {
 		run_online();
 	} else if (options.exec_type == OFFLINE) {
-		raler("not implemented yet");
+		log_error("not implemented yet");
+		exit(EXIT_FAILURE);
 	} else {
-		raler("Usage: you must specify either -i or -o option");
+		log_error("Usage: you must specify either -i or -o option");
+		exit(EXIT_FAILURE);
 	}
 
 	exit(EXIT_SUCCESS);

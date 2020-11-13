@@ -3,7 +3,7 @@ CFLAGS  ?= -Wall -Wextra
 LDLIBS  ?= -lpcap
 
 INCLUDE_PATH = ./include
-TARGET   = main
+TARGET   = monitor
 SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
