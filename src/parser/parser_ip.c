@@ -6,14 +6,7 @@
 #define TCP 0x06
 #define UDP 0x11
 
-static void log_addr(uint32_t addr) {
-	unsigned char bytes[4];
-	bytes[0] = addr & 0xFF;
-	bytes[1] = (addr >> 8) & 0xFF;
-	bytes[2] = (addr >> 16) & 0xFF;
-	bytes[3] = (addr >> 24) & 0xFF;
-	log_format("%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
-}
+
 
 void parse_ip(const unsigned char *packet) {
 	struct iphdr *hdr = (struct iphdr *)packet;
@@ -81,6 +74,7 @@ void parse_ip(const unsigned char *packet) {
 		parse_tcp(packet + hdr->ihl * 4);
 		break;
 	case UDP:
+		parse_udp(packet + hdr->ihl * 4);
 		break;
 	default:
 		log_formatln("\tProtocol : unsupported");

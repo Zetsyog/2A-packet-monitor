@@ -1,6 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <sys/types.h>
+
 #define RED "\033[0;31m"
 #define BOLD_RED "\033[1;31m"
 #define GREEN "\033[0;32m"
@@ -25,6 +27,6 @@ void set_offset(unsigned int offset);
 void log_offset();
 void log_format(const char *message, ...);
 void log_formatln(const char *message, ...);
-
+void log_addr(u_int32_t addr);
 void log_error(const char *message, ...);
 #endif

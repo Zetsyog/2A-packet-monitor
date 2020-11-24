@@ -1,17 +1,18 @@
 #include "capture/common.h"
-#include "signal.h"
 #include "parser.h"
+#include "signal.h"
 #include "util.h"
 
 void intHandler(int dummy) {
-	(void) dummy;
+	(void)dummy;
 
 	pcap_breakloop(handle);
 }
 
 void got_packet(u_char *user, const struct pcap_pkthdr *h,
 				const u_char *bytes) {
-	(void) user;
+	(void)user;
+	(void)h;
 
 	// printf("==== Got a %d byte packet ====\n", h->len);
 	parse_ethernet(bytes);

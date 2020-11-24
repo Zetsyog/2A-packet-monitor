@@ -52,3 +52,12 @@ void log_error(const char *message, ...) {
 	printf(RESET);
 	printf("\n");
 }
+
+void log_addr(u_int32_t addr) {
+	unsigned char bytes[4];
+	bytes[0] = addr & 0xFF;
+	bytes[1] = (addr >> 8) & 0xFF;
+	bytes[2] = (addr >> 16) & 0xFF;
+	bytes[3] = (addr >> 24) & 0xFF;
+	log_format("%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
+}

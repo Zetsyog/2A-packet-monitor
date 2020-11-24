@@ -1,7 +1,7 @@
 #include "logger.h"
-#include "netinet/tcp.h"
 #include "parser.h"
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 
 #define HTTP 80
 
