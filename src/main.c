@@ -1,9 +1,11 @@
-#include <options.h>
+#include "capture/common.h"
+#include "capture/offline.h"
+#include "capture/online.h"
+#include "options.h"
+#include "util.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <capture/online.h>
 #include <unistd.h>
-#include "util.h"
 
 #define USAGE "Usage : %s (-i <interface>| -o <file>) [-f <filter>] [-v <1..3>]"
 
@@ -11,20 +13,26 @@ int main(int argc, char **argv) {
 	int opt;
 	options.exec_type = NONE;
 	options.verbose_level = COMPLETE;
+	options.filter = NULL;
 
 	while ((opt = getopt(argc, argv, "i:o:f:v:")) != -1) {
 		switch (opt) {
 		case 'i':
+			if(options.exec_type != NONE) {
+				log_error(USAGE, argv[0]);
+			}
 			options.exec_type = ONLINE;
 			options.name = optarg;
 			break;
 		case 'o':
+			if(options.exec_type != NONE) {
+				log_error(USAGE, argv[0]);
+			}
 			options.exec_type = OFFLINE;
 			options.name = optarg;
 			break;
 		case 'f':
-			// TODO : filter
-			printf("WARNING : filter not implemented. Ignoring arg\n");
+			options.filter = optarg;
 			break;
 		case 'v':
 			options.verbose_level = atoi(optarg);
@@ -49,8 +57,7 @@ int main(int argc, char **argv) {
 	if (options.exec_type == ONLINE) {
 		run_online();
 	} else if (options.exec_type == OFFLINE) {
-		log_error("not implemented yet");
-		exit(EXIT_FAILURE);
+		run_offline();
 	} else {
 		log_error("Usage: you must specify either -i or -o option");
 		exit(EXIT_FAILURE);

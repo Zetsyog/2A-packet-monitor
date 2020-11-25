@@ -1,8 +1,10 @@
 #include "logger.h"
 #include "parser.h"
-#include "parser/bootp.h"
 #include <arpa/inet.h>
 #include <netinet/udp.h>
+
+#define BOOTP_SERVER_PORT 67
+#define BOOTP_CLIENT_PORT 68
 
 void parse_udp(const unsigned char *packet) {
 	struct udphdr *hdr = (struct udphdr *)packet;
@@ -12,7 +14,7 @@ void parse_udp(const unsigned char *packet) {
 	BEGIN_LOG(COMPLETE);
 
 	set_offset(2);
-	log_formatln("- UDP Header -");
+	log_title("UDP Header");
 
 	log_formatln("%-15s%hu", "Source Port :", source);
 	log_formatln("%-15s%hu", "Dest Port :", dest);

@@ -4,16 +4,17 @@
 #include <netinet/tcp.h>
 
 #define HTTP 80
+#define SMTP 25
 
-void parse_tcp(const unsigned char *packet) {
+void parse_tcp(const unsigned char *packet, uint16_t size) {
 	struct tcphdr *hdr = (struct tcphdr *)packet;
 	uint16_t source = ntohs(hdr->source), dest = ntohs(hdr->dest),
-			 doff = ntohs(hdr->doff);
+			 doff = hdr->doff;
 
 	BEGIN_LOG(COMPLETE);
 
 	set_offset(2);
-	log_formatln("- TCP Header -");
+	log_title("TCP Header");
 
 	log_formatln("%-15s%hu", "Source Port :", source);
 	log_formatln("%-15s%hu", "Dest Port :", dest);
@@ -50,9 +51,9 @@ void parse_tcp(const unsigned char *packet) {
 
 	END_LOG();
 
-	switch (dest) {
-	case HTTP:
-		parse_http(packet + hdr->doff * 4);
-		break;
+	if(dest == HTTP || source == HTTP) {
+		parse_http(packet + doff * 4, size - doff * 4);
+	} else if(dest == SMTP || source == SMTP) {
+		parse_smtp(packet + doff * 4, size - doff * 4);
 	}
 }

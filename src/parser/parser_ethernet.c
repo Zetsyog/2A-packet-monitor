@@ -19,16 +19,16 @@ void parse_ethernet(const unsigned char *packet) {
     BEGIN_LOG(COMPLETE);
 
     set_offset(0);
-	log_formatln("- Ethernet Header -");
-	log_format("Destination : ");
+	log_title("Ethernet Header");
+	log_format("%-15s", "Destination");
 	log_mac_addr(hdr->h_dest);
 	log_formatln("");
 
-	log_format("Source : ");
+	log_format("%-15s", "Source");
 	log_mac_addr(hdr->h_source);
 	log_formatln("");
 
-    log_formatln("Type : %s", proto_str);
+    log_formatln("%-15s%s", "Type", proto_str);
 
     END_LOG();
 

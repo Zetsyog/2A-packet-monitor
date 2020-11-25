@@ -16,21 +16,22 @@ void parse_ip(const unsigned char *packet) {
 	uint32_t daddr = ntohl(hdr->daddr), saddr = ntohl(hdr->saddr);
 	uint16_t frag_off = ntohs(hdr->frag_off);
     uint16_t tot_len = ntohs(hdr->tot_len);
+	uint16_t ihl = hdr->ihl;
 
 	// Complete verbose display
 	BEGIN_LOG(COMPLETE);
 
 	set_offset(1);
-	log_formatln("- IP header -");
+	log_title("IP header");
 
-	log_formatln("%-15s%i", "Version :", hdr->version);
-	log_formatln("%-15s%i", "IHL", hdr->ihl);
+	log_formatln("%-15s%i", "Version", hdr->version);
+	log_formatln("%-15s%i", "IHL", ihl);
 	log_formatln("%-15s0x%04x", "TOS", ntohs(hdr->tos));
-	log_formatln("%-15s%d", "Total length :", tot_len);
-	log_formatln("%-15s0x%04x", "Id : ", ntohs(hdr->id));
+	log_formatln("%-15s%d", "Total length", tot_len);
+	log_formatln("%-15s0x%04x", "Id", ntohs(hdr->id));
 
 	log_offset();
-	log_format("%-15s%s", "Flags :", "[");
+	log_format("%-15s%s", "Flags", "[");
 	if (frag_off & 1 << 14)
 		log_format(" DF");
 	if (frag_off & 1 << 13)
@@ -39,18 +40,18 @@ void parse_ip(const unsigned char *packet) {
 
 	frag_off &= ~(0b111 << 12);
 
-	log_formatln("%-15s%i", "Frag off :", frag_off);
-	log_formatln("%-15s%i", "TTL :", hdr->ttl);
-	log_formatln("%-15s%s", "Protocol :", protocol_str);
+	log_formatln("%-15s%i", "Frag off", frag_off);
+	log_formatln("%-15s%i", "TTL", hdr->ttl);
+	log_formatln("%-15s%s", "Protocol", protocol_str);
 	log_formatln("%-15s%04x", "CHKSUM", ntohs(hdr->check));
 
 	log_offset();
-	log_format("%-15s", "Source Addr :");
+	log_format("%-15s", "Source Addr");
 	log_addr(saddr);
 	log_format("\n");
 
 	log_offset();
-	log_format("%-15s", "Dest Addr : ");
+	log_format("%-15s", "Dest Addr");
 	log_addr(daddr);
 	log_format("\n");
 
@@ -71,10 +72,10 @@ void parse_ip(const unsigned char *packet) {
 
 	switch (protocol) {
 	case TCP:
-		parse_tcp(packet + hdr->ihl * 4);
+		parse_tcp(packet + ihl * 4, tot_len - ihl * 4);
 		break;
 	case UDP:
-		parse_udp(packet + hdr->ihl * 4);
+		parse_udp(packet + ihl * 4);
 		break;
 	default:
 		log_formatln("\tProtocol : unsupported");

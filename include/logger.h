@@ -29,4 +29,6 @@ void log_format(const char *message, ...);
 void log_formatln(const char *message, ...);
 void log_addr(u_int32_t addr);
 void log_error(const char *message, ...);
+void log_buf(const unsigned char *buf);
+void log_title(const char *title);
 #endif
