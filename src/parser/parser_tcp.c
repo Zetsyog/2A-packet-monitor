@@ -5,6 +5,7 @@
 
 #define HTTP 80
 #define SMTP 25
+#define TELNET 23
 
 void parse_tcp(const unsigned char *packet, uint16_t size) {
 	struct tcphdr *hdr = (struct tcphdr *)packet;
@@ -51,9 +52,14 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 
 	END_LOG();
 
+	uint16_t tcp_payload = size - doff * 4;
+	if(tcp_payload == 0) return;
+	
 	if(dest == HTTP || source == HTTP) {
 		parse_http(packet + doff * 4, size - doff * 4);
 	} else if(dest == SMTP || source == SMTP) {
 		parse_smtp(packet + doff * 4, size - doff * 4);
+	} else if(dest == TELNET || source == TELNET) {
+		parse_telnet(packet + doff * 4, size - doff * 4);
 	}
 }

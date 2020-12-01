@@ -1,5 +1,6 @@
 #include "logger.h"
 #include "options.h"
+#include <bits/types.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@ void set_offset(unsigned int i) {
 }
 
 void log_offset() {
-	
+
 	for (int i = 0; i < offset; i++) {
 		printf("\t");
 	}
@@ -54,7 +55,7 @@ void log_error(const char *message, ...) {
 	printf("\n");
 }
 
-void log_addr(u_int32_t addr) {
+void log_addr(uint32_t addr) {
 	unsigned char bytes[4];
 	bytes[0] = addr & 0xFF;
 	bytes[1] = (addr >> 8) & 0xFF;
@@ -63,13 +64,26 @@ void log_addr(u_int32_t addr) {
 	log_format("%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
 }
 
-void log_buf(const unsigned char *buf) {
-	char * line = strtok((char *) buf, "\n");
-	while(line) {
-		log_offset();
-		log_format("%s\n", line);
-		line  = strtok(NULL, "\n");
+void log_buf(const unsigned char *buf, uint16_t size) {
+	int write = 0;
+	log_offset();
+	for (int i = 0; i < size; i++) {
+		if(buf[i] == 0) break;
+		switch (buf[i]) {
+		case '\r':
+			printf("\\r");
+			break;
+		case '\n':
+			printf("\\n\n");
+			log_offset();
+			break;
+		default:
+			printf("%c", buf[i]);
+			break;
+		}
+		write++;
 	}
+	printf("\n");
 }
 
 void log_title(const char *title) {
