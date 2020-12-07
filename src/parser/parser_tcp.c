@@ -6,6 +6,10 @@
 #define HTTP 80
 #define SMTP 25
 #define TELNET 23
+#define FTP 21
+
+#define CHECK_PROTO(x) source == x || dest == x
+
 
 void parse_tcp(const unsigned char *packet, uint16_t size) {
 	struct tcphdr *hdr = (struct tcphdr *)packet;
@@ -52,14 +56,17 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 
 	END_LOG();
 
-	uint16_t tcp_payload = size - doff * 4;
-	if(tcp_payload == 0) return;
+	uint16_t payload_size = size - doff * 4;
+	const unsigned char *next = packet + doff * 4;
+	if(payload_size == 0) return;
 	
-	if(dest == HTTP || source == HTTP) {
-		parse_http(packet + doff * 4, size - doff * 4);
-	} else if(dest == SMTP || source == SMTP) {
-		parse_smtp(packet + doff * 4, size - doff * 4);
-	} else if(dest == TELNET || source == TELNET) {
-		parse_telnet(packet + doff * 4, size - doff * 4);
+	if(CHECK_PROTO(HTTP)) {
+		parse_http(next, payload_size);
+	} else if(CHECK_PROTO(SMTP)) {
+		parse_smtp(next, payload_size);
+	} else if(CHECK_PROTO(TELNET)) {
+		parse_telnet(next, payload_size);
+	} else if(CHECK_PROTO(FTP)) {
+		parse_ftp(next, payload_size);
 	}
 }

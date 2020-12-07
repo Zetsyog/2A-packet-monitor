@@ -13,9 +13,18 @@ void intHandler(int dummy) {
 }
 
 void got_packet(u_char *user, const struct pcap_pkthdr *h,
-				const u_char *bytes) {
+				const u_char *bytes) {	
 	(void)user;
-	(void)h;
+
+	static time_t first_ts = 0;
+
+	if(!first_ts)
+		first_ts = h->ts.tv_sec;
+
+	printf("\nFRAME Time: %li.%li Length: %i bytes", h->ts.tv_sec - first_ts, h->ts.tv_usec, h->len);
+	
+	if(options.verbose_level >= SYNTH)
+		printf("\n");
 
 	// printf("==== Got a %d byte packet ====\n", h->len);
 	parse_ethernet(bytes);

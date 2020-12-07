@@ -6,14 +6,13 @@
 #define TCP 0x06
 #define UDP 0x11
 
-
-
 void parse_ip(const unsigned char *packet) {
 	struct iphdr *hdr = (struct iphdr *)packet;
 	unsigned int protocol = hdr->protocol;
 	char *protocol_str =
 		protocol == TCP ? "TCP" : protocol == UDP ? "UDP" : "unsupported";
-	uint32_t daddr = ntohl(hdr->daddr), saddr = ntohl(hdr->saddr);
+
+	uint32_t daddr = hdr->daddr, saddr = hdr->saddr;
 	uint16_t frag_off = ntohs(hdr->frag_off);
     uint16_t tot_len = ntohs(hdr->tot_len);
 	uint16_t ihl = hdr->ihl;

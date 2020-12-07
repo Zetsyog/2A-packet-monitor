@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include <stdint.h>
+#include <netinet/in.h>
 
 #define RED "\033[0;31m"
 #define BOLD_RED "\033[1;31m"
@@ -28,6 +29,7 @@ void log_offset();
 void log_format(const char *message, ...);
 void log_formatln(const char *message, ...);
 void log_addr(uint32_t addr);
+void log_addr6(struct in6_addr addr);
 void log_error(const char *message, ...);
 void log_buf(const unsigned char *buf, uint16_t);
 void log_title(const char *title);

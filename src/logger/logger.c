@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 static int offset = 0;
 
@@ -56,12 +57,18 @@ void log_error(const char *message, ...) {
 }
 
 void log_addr(uint32_t addr) {
-	unsigned char bytes[4];
-	bytes[0] = addr & 0xFF;
-	bytes[1] = (addr >> 8) & 0xFF;
-	bytes[2] = (addr >> 16) & 0xFF;
-	bytes[3] = (addr >> 24) & 0xFF;
-	log_format("%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
+	char str[INET_ADDRSTRLEN];
+
+	inet_ntop(AF_INET, &addr, str, INET_ADDRSTRLEN);
+	log_format("%s", str);
+}
+
+void log_addr6(struct in6_addr addr) {
+	char str[INET6_ADDRSTRLEN]; // space to hold the IPv6 string
+
+	inet_ntop(AF_INET6, &addr, str, INET6_ADDRSTRLEN);
+
+	log_format("%s", str);
 }
 
 void log_buf(const unsigned char *buf, uint16_t size) {
