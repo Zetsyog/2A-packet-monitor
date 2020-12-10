@@ -5,6 +5,8 @@
 
 #define BOOTP_SERVER_PORT 67
 #define BOOTP_CLIENT_PORT 68
+#define DNS_PORT 53
+
 
 void parse_udp(const unsigned char *packet) {
 	struct udphdr *hdr = (struct udphdr *)packet;
@@ -32,5 +34,7 @@ void parse_udp(const unsigned char *packet) {
 
 	if (dest == BOOTP_CLIENT_PORT || source == BOOTP_SERVER_PORT) {
         parse_bootp(packet + sizeof(struct udphdr));
-    }
+    } else if(dest == DNS_PORT || source == DNS_PORT) {
+		parse_dns(packet + sizeof(struct udphdr));
+	}
 }
