@@ -18,14 +18,14 @@ int main(int argc, char **argv) {
 	while ((opt = getopt(argc, argv, "i:o:f:v:")) != -1) {
 		switch (opt) {
 		case 'i':
-			if(options.exec_type != NONE) {
+			if (options.exec_type != NONE) {
 				log_error(USAGE, argv[0]);
 			}
 			options.exec_type = ONLINE;
 			options.name = optarg;
 			break;
 		case 'o':
-			if(options.exec_type != NONE) {
+			if (options.exec_type != NONE) {
 				log_error(USAGE, argv[0]);
 			}
 			options.exec_type = OFFLINE;
@@ -59,7 +59,8 @@ int main(int argc, char **argv) {
 	} else if (options.exec_type == OFFLINE) {
 		run_offline();
 	} else {
-		log_error("Usage: you must specify either -i or -o option");
+		log_error(USAGE, argv[0]);
+		log_error("you must specify either -i or -o option");
 		exit(EXIT_FAILURE);
 	}
 

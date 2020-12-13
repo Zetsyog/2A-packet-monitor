@@ -54,18 +54,14 @@ void log_formatln(const char *message, ...) {
 }
 
 void log_error(const char *message, ...) {
-	printf(BOLD_RED);
-	printf("Error : ");
-	printf(RESET);
-
-	printf(RED);
+	fprintf(stderr, RED);
 	va_list args;
 	va_start(args, message);
-	vprintf(message, args);
+	vfprintf(stderr, message, args);
 	va_end(args);
 
-	printf(RESET);
-	printf("\n");
+	fprintf(stderr, RESET);
+	fprintf(stderr, "\n");
 }
 
 void log_addr(uint32_t addr) {
