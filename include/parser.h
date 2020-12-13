@@ -17,5 +17,6 @@ void parse_telnet(const unsigned char *packet, uint16_t size);
 void parse_pop(const unsigned char *packet, uint16_t size);
 void parse_http(const unsigned char *packet, uint16_t size);
 void parse_ftp(const unsigned char *packet, uint16_t size);
+void parse_imap(const unsigned char *packet, uint16_t size);
 
 #endif

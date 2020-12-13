@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <arpa/inet.h>
 
 static int offset = 0;
@@ -102,7 +103,10 @@ void log_buf_offset(const unsigned char *buf, uint16_t size) {
 			log_offset();
 			break;
 		default:
-			log_format("%c", buf[i]);
+			if(isprint(buf[i]))
+				log_format("%c", buf[i]);
+			else 
+				log_format(".");
 			break;
 		}
 		write++;

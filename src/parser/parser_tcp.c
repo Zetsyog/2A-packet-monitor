@@ -9,6 +9,8 @@
 #define FTP 21
 #define POP2 109
 #define POP3 110
+#define IMAP 143
+#define IMAP_SSL 993
 
 #define CHECK_PROTO(x) source == x || dest == x
 
@@ -80,5 +82,7 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 		parse_ftp(next, payload_size);
 	} else if (CHECK_PROTO(POP2) || CHECK_PROTO(POP3)) {
 		parse_pop(next, payload_size);
+	} else if (CHECK_PROTO(IMAP) || CHECK_PROTO(IMAP_SSL)) {
+		parse_imap(next, payload_size);
 	}
 }

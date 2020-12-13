@@ -74,7 +74,7 @@ void parse_ip(const unsigned char *packet) {
 	 */
 	set_verbosity(CONCISE);
 	
-	log_format("IP Src: ");
+	log_format(", IPv4 Src: ");
 	log_addr(saddr);
 	log_format(", Dst: ");
 	log_addr(daddr);

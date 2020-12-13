@@ -3,14 +3,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-void parse_smtp(const unsigned char *packet, const uint16_t size) {
+void parse_imap(const unsigned char *packet, const uint16_t size) {
 	/**
 	 * COMPLETE Verbosity
 	 */
 	set_verbosity(COMPLETE);
 	set_offset(3);
 
-	log_title("SMTP Header");
+	log_title("IMAP");
 	log_formatln("%-15s%hu", "Size", size);
 	if (size) {
 		log_formatln("- Data -");
@@ -22,11 +22,11 @@ void parse_smtp(const unsigned char *packet, const uint16_t size) {
 	 */
 	set_verbosity(SYNTH);
 	set_offset(3);
-	log_formatln("SMTP, size: %hu", size);
+	log_formatln("Internet Message Access Protocol, size: %hu", size);
 
 	/**
 	 * CONCISE Verbosity
 	 */
 	set_verbosity(CONCISE);
-	log_format(", SMTP");
+	log_format(", IMAP");
 }

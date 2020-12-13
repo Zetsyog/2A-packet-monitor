@@ -37,7 +37,7 @@ void got_packet(u_char *user, const struct pcap_pkthdr *h,
 		i = i / 10;
 		count--;
 	}
-	printf("%li.%04ld FRAME %u (%i bytes) ", h->ts.tv_sec - first_ts, i, pkt_nb, h->len);
+	printf("%li.%04ld FRAME %u (%i bytes)", h->ts.tv_sec - first_ts, i, pkt_nb, h->len);
 	
 	if(options.verbose_level >= SYNTH)
 		printf("\n");
