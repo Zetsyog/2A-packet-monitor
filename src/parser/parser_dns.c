@@ -10,7 +10,6 @@ static void read_name(uint8_t *hdr, uint8_t **base, int *label_nb,
 	uint16_t type;
 	int count = 0;
 	int pointer = 0;
-	// log_formatln("%02x %02x", *cursor, *(cursor + 1));
 
 	while (*cursor != 0) {
 		if (isprint(*cursor)) {
@@ -19,18 +18,15 @@ static void read_name(uint8_t *hdr, uint8_t **base, int *label_nb,
 			type = ntohs(*((uint16_t *)cursor));
 
 			if (IS_POINTER(type)) {
-				// log_formatln("ispointer %04x (%04x)", type,
-				// GET_OFFSET(type));
 				cursor = hdr + GET_OFFSET(type);
 				if (!pointer)
 					*base += 2;
 				pointer = 1;
-			} else {
-				if (label_nb != NULL)
-					*label_nb += 1;
-				if (count)
-					log_format(".");
 			}
+			if (label_nb != NULL)
+				*label_nb += 1;
+			if (count)
+				log_format(".");
 		}
 		count++;
 		cursor += 1;
