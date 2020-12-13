@@ -18,6 +18,10 @@ void parse_ethernet(const unsigned char *packet) {
 		proto_str = "IPv4";
 	if (proto == ETH_P_IPV6)
 		proto_str = "IPv6";
+	if(proto == ETH_P_ARP)
+		proto_str = "ARP";
+	if(proto == ETH_P_RARP)
+		proto_str = "RARP";
 
 	/**
 	 * COMPLETE Verbosity
@@ -57,8 +61,10 @@ void parse_ethernet(const unsigned char *packet) {
 		parse_ipv6(packet + sizeof(struct ethhdr));
 		break;
 	case ETH_P_ARP:
+	case ETH_P_RARP:
 		parse_arp(packet + sizeof(struct ethhdr));
 		break;
+	
 	default:
 		break;
 	}

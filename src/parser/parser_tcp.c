@@ -7,6 +7,8 @@
 #define SMTP 25
 #define TELNET 23
 #define FTP 21
+#define POP2 109
+#define POP3 110
 
 #define CHECK_PROTO(x) source == x || dest == x
 
@@ -76,5 +78,7 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 		parse_telnet(next, payload_size);
 	} else if (CHECK_PROTO(FTP)) {
 		parse_ftp(next, payload_size);
+	} else if (CHECK_PROTO(POP2) || CHECK_PROTO(POP3)) {
+		parse_pop(next, payload_size);
 	}
 }
