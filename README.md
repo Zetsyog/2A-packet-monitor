@@ -55,9 +55,9 @@ Layer 5 (Application layer)
 Parsing of certain protocols can be partial.
 ## Credit
 
--   bootp.h : [https://samy.pl/packet/MISC/tcpdump-3.7.1/bootp.h]
+-   bootp.h : https://samy.pl/packet/MISC/tcpdump-3.7.1/bootp.h
 
 All packet captured used for tests are from
 
--   [https://wiki.wireshark.org/SampleCaptures]
--   [https://packetlife.net/captures/]
+-   https://wiki.wireshark.org/SampleCaptures
+-   https://packetlife.net/captures/
