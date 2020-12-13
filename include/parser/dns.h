@@ -33,6 +33,14 @@ struct dns_hdr {
 #define RA_RECURSION_NOT_AVAILABLE 0
 #define RA_RECURSION_AVAILABLE 1
 
+// DNS types
+#define DNS_TYPE_A 1
+#define DNS_TYPE_NS 2
+#define DNS_TYPE_CNAME 5
+#define DNS_TYPE_SOA 6
+#define DNS_TYPE_PTR 12
+#define DNS_TYPE_AAAA 28
+
 #define DNS_QR_MASK 0x8000
 #define DNS_OPCODE_MASK 0x7800
 #define DNS_AA_MASK 0x0400

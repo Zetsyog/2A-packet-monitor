@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 void parse_ethernet(const unsigned char *packet);
+void parse_arp(const unsigned char *packet);
 void parse_ip(const unsigned char *packet);
 void parse_ipv6(const unsigned char *packet);
 void parse_tcp(const unsigned char *packet, uint16_t size);

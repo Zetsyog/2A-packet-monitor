@@ -1,80 +1,83 @@
 #include "logger.h"
 #include "parser/dns.h"
 #include <arpa/inet.h>
+#include <ctype.h>
 #include <stdlib.h>
 
 static void read_name(uint8_t *hdr, uint8_t **base, int *label_nb,
-					  int *label_len, int pointer) {
+					  int *label_len) {
 	uint8_t *cursor = *base;
 	uint16_t type;
+	int count = 0;
+	int pointer = 0;
+	// log_formatln("%02x %02x", *cursor, *(cursor + 1));
 
-	while (1) {
-		uint8_t len = *cursor;
-		// log_formatln("\ndebug : len = %02x", len);
-		// log_offset();
-		if (len == 0) {
-			if (!pointer)
-				*base += 2;
-			break;
+	while (*cursor != 0) {
+		if (isprint(*cursor)) {
+			log_format("%c", *cursor);
+		} else {
+			type = ntohs(*((uint16_t *)cursor));
+
+			if (IS_POINTER(type)) {
+				// log_formatln("ispointer %04x (%04x)", type,
+				// GET_OFFSET(type));
+				cursor = hdr + GET_OFFSET(type);
+				if (!pointer)
+					*base += 2;
+				pointer = 1;
+			} else {
+				if (label_nb != NULL)
+					*label_nb += 1;
+				if (count)
+					log_format(".");
+			}
 		}
-
-		type = ntohs(*((uint16_t *)cursor));
-
-		if (IS_POINTER(type)) {
-			// log_formatln("ispointer %04x (%04x)", type, GET_OFFSET(type));
-			cursor = hdr + GET_OFFSET(type);
-			read_name(hdr, &cursor, label_nb, label_len, 1);
-			if (!pointer)
-				*base += 2;
-
-			break;
-		}
-
-		if (label_nb != NULL)
-			(*label_nb)++;
-
+		count++;
 		cursor += 1;
 		if (!pointer)
 			*base += 1;
-
-		for (int i = 0; i < len; i++) {
-			if (label_len != NULL)
-				*label_len += 1;
-			log_format("%c", (unsigned char)*cursor);
-			cursor++;
-			if (!pointer)
-				(*base)++;
-		}
-
-		if (*cursor != 0) {
-			log_format(".");
-		}
 	}
 	if (!pointer)
-		log_format("\n");
+		*base += 1;
+
+	if (label_len != NULL)
+		*label_len = count - 1;
+
+	log_format("\n");
 }
 
 static void parse_rr(uint8_t *hdr, uint8_t **payload) {
 	int name_len = 0, label_nb = 0;
+	uint16_t type, data_len;
 
 	log_offset();
 	log_format("%-15s", "Name");
-	read_name((uint8_t *)hdr, payload, &label_nb, &name_len, 0);
+	read_name((uint8_t *)hdr, payload, &label_nb, &name_len);
 
 	log_formatln("%-15s%u", "[Name len]", name_len);
 	log_formatln("%-15s%u", "[Label nb]", label_nb);
-	log_formatln("%-15s%u", "Type", ntohs(*((uint16_t *)*payload)));
+	type = ntohs(*((uint16_t *)*payload));
+	log_formatln("%-15s%u", "Type", type);
 	*payload += 2;
 	log_formatln("%-15s%u", "Class", ntohs(*((uint16_t *)*payload)));
 	*payload += 2;
 	log_formatln("%-15s%lu", "TTL", ntohl(*((uint32_t *)*payload)));
 	*payload += 4;
-	log_formatln("%-15s%u", "Data len", ntohs(*((uint16_t *)*payload)));
+	data_len = ntohs(*((uint16_t *)*payload));
+	log_formatln("%-15s%u", "Data len", data_len);
 	*payload += 2;
 
 	log_offset();
 	log_format("%-15s", "Data");
-	read_name((uint8_t *)hdr, payload, NULL, NULL, 0);
+	if (type == DNS_TYPE_CNAME) {
+		read_name((uint8_t *)hdr, payload, NULL, NULL);
+	} else if (type == DNS_TYPE_A) {
+		log_addr(*((uint32_t *)*payload));
+		*payload += data_len;
+	} else {
+		log_buf(*payload, data_len);
+		*payload += data_len;
+	}
 
 	log_format("\n");
 }
@@ -88,7 +91,10 @@ void parse_dns(const unsigned char *packet) {
 	uint16_t additional_rr = ntohs(hdr->total_additional_rr);
 
 	set_offset(3);
-	BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 	log_title("DNS");
 	log_formatln("%-15s0x%04x", "Trans. ID", ntohs(hdr->id));
 
@@ -127,18 +133,18 @@ void parse_dns(const unsigned char *packet) {
 
 		for (int i = 0; i < questions; i++) {
 			int name_len = 0, label_nb = 0;
-			log_formatln("Question %i", i);
+			log_formatln("Question %i", i + 1);
 			set_offset(5);
 			log_offset();
 			log_format("%-15s", "Name");
-			read_name((uint8_t *)hdr, &payload, &label_nb, &name_len, 0);
+			read_name((uint8_t *)hdr, &payload, &label_nb, &name_len);
 
 			log_formatln("%-15s%u", "[Name len]", name_len);
 			log_formatln("%-15s%u", "[Label nb]", label_nb);
-			log_formatln("%-15s%u", "Type", *((uint16_t *)payload));
+			log_formatln("%-15s%u", "Type", ntohs(*((uint16_t *)payload)));
 			payload += 2;
-			log_formatln("%-15s%u", "Class", *((uint8_t *)payload));
-			payload += 1;
+			log_formatln("%-15s%u", "Class", ntohs(*((uint16_t *)payload)));
+			payload += 2;
 		}
 	}
 
@@ -150,9 +156,9 @@ void parse_dns(const unsigned char *packet) {
 
 		for (int i = 0; i < answer_rr; i++) {
 			set_offset(4);
-			log_formatln("- Answer %i", i);
+			log_formatln("- Answer %i", i + 1);
 			set_offset(5);
-			parse_rr((uint8_t *) hdr, &payload);
+			parse_rr((uint8_t *)hdr, &payload);
 		}
 	}
 
@@ -164,9 +170,9 @@ void parse_dns(const unsigned char *packet) {
 
 		for (int i = 0; i < answer_rr; i++) {
 			set_offset(4);
-			log_formatln("- Authority RR %i", i);
+			log_formatln("- Authority RR %i", i + 1);
 			set_offset(5);
-			parse_rr((uint8_t *) hdr, &payload);
+			parse_rr((uint8_t *)hdr, &payload);
 		}
 	}
 
@@ -178,11 +184,23 @@ void parse_dns(const unsigned char *packet) {
 
 		for (int i = 0; i < answer_rr; i++) {
 			set_offset(4);
-			log_formatln("- Additional RR %i", i);
+			log_formatln("- Additional RR %i", i + 1);
 			set_offset(5);
-			parse_rr((uint8_t *) hdr, &payload);
+			parse_rr((uint8_t *)hdr, &payload);
 		}
 	}
 
-	END_LOG();
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
+	set_offset(3);
+	log_offset();
+	log_format("Domain name system ");
+	if (questions) {
+		log_format("(question)");
+	} else if (answer_rr) {
+		log_format("(answer)");
+	}
+	log_format("\n");
 }

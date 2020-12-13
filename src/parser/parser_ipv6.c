@@ -35,14 +35,18 @@ void parse_ipv6(const unsigned char *packet) {
 	struct ip6_flow_t *flow =
 		(struct ip6_flow_t *)&(hdr->ip6_ctlun.ip6_un1.ip6_un1_flow);
 
-	// Complete verbose display
-	BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 
 	set_offset(1);
 	log_title("IPv6 header");
 	log_formatln("%-15s%i", "Version : ", flow->version);
-	log_formatln("%-15s0x%01x%01x", "Traffic Class", flow->traffic_class_hi, flow->traffic_class_lo);
-	log_formatln("%-15s0x%02x%04x", "Flow Label", flow->flow_label_hi, flow->flow_label_lo);
+	log_formatln("%-15s0x%01x%01x", "Traffic Class", flow->traffic_class_hi,
+				 flow->traffic_class_lo);
+	log_formatln("%-15s0x%02x%04x", "Flow Label", flow->flow_label_hi,
+				 flow->flow_label_lo);
 	log_formatln("%-15s%u", "Payload len", payload_len);
 	log_formatln("%-15s%s", "Next Header", protocol_str);
 	log_formatln("%-15s%d", "Hop limit", hdr->ip6_ctlun.ip6_un1.ip6_un1_hlim);
@@ -57,10 +61,10 @@ void parse_ipv6(const unsigned char *packet) {
 	log_addr6(daddr);
 	log_format("\n");
 
-	END_LOG();
-
-	// Synth verbodse
-	BEGIN_LOG(SYNTH);
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 
 	set_offset(1);
 	log_offset();
@@ -70,8 +74,6 @@ void parse_ipv6(const unsigned char *packet) {
 	log_addr6(daddr);
 	log_format("\n");
 
-	END_LOG();
-	
 	switch (protocol) {
 	case TCP:
 		parse_tcp(packet + HEADER_SIZE, payload_len);

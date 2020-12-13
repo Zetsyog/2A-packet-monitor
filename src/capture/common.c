@@ -5,6 +5,7 @@
 #include "util.h"
 #include <pcap/pcap.h>
 #include <stdlib.h>
+#include <string.h>
 
 void intHandler(int dummy) {
 	(void)dummy;
@@ -21,13 +22,30 @@ void got_packet(u_char *user, const struct pcap_pkthdr *h,
 	if(!first_ts)
 		first_ts = h->ts.tv_sec;
 
-	printf("\nNo. %u FRAME Time: %li.%li Length: %i bytes", pkt_nb, h->ts.tv_sec - first_ts, h->ts.tv_usec, h->len);
+	if(options.verbose_level >= SYNTH)
+		printf("-----------------------------------------------------\n");
+	
+	// Printing only 4 digits
+	suseconds_t i = h->ts.tv_usec;
+	int count = 0;
+	while(i != 0) {
+		i = i / 10;
+		count++;
+	}
+	i = h->ts.tv_usec;
+	while(count > 4) {
+		i = i / 10;
+		count--;
+	}
+	printf("%li.%04ld FRAME %u (%i bytes) ", h->ts.tv_sec - first_ts, i, pkt_nb, h->len);
 	
 	if(options.verbose_level >= SYNTH)
 		printf("\n");
 
 	// printf("==== Got a %d byte packet ====\n", h->len);
 	parse_ethernet(bytes);
+
+	printf("\n");
 
 	pkt_nb++;
 }

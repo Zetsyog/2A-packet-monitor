@@ -4,9 +4,12 @@
 #include <unistd.h>
 
 void parse_smtp(const unsigned char *packet, const uint16_t size) {
-	BEGIN_LOG(COMPLETE);
-
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 	set_offset(3);
+
 	log_title("SMTP Header");
 	log_formatln("%-15s%hu", "Size", size);
 	if (size) {
@@ -14,11 +17,16 @@ void parse_smtp(const unsigned char *packet, const uint16_t size) {
 		log_buf(packet, size);
 	}
 
-	END_LOG();
-
-	BEGIN_LOG(SYNTH);
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 	set_offset(3);
-	log_formatln("SMTP Size = %hu", size);
+	log_formatln("SMTP, size: %hu", size);
 
-	END_LOG();
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", SMTP");
 }

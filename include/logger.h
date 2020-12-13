@@ -1,8 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <stdint.h>
 #include <netinet/in.h>
+#include <stdint.h>
 
 #define RED "\033[0;31m"
 #define BOLD_RED "\033[1;31m"
@@ -18,12 +18,18 @@
 #define BOLD_CYAN "\033[1;36m"
 #define RESET "\033[0m"
 
-#define BEGIN_LOG(verb) if (verbosity == verb) {
-#define END_LOG() }
+#define BEGIN_LOG(verb)      \
+	do {                     \
+		set_verbosity(verb); \
+	} while (0)
+#define END_LOG() \
+	do {          \
+	} while (0)
 
-enum { CONCISE = 1, SYNTH = 2, COMPLETE = 3 } verbosity;
+enum LEVEL { CONCISE = 1, SYNTH = 2, COMPLETE = 3 };
 
 void set_verbosity(int level);
+void set_max_verbosity(int level);
 void set_offset(unsigned int offset);
 void log_offset();
 void log_format(const char *message, ...);
@@ -32,5 +38,6 @@ void log_addr(uint32_t addr);
 void log_addr6(struct in6_addr addr);
 void log_error(const char *message, ...);
 void log_buf(const unsigned char *buf, uint16_t);
+void log_buf_offset(const unsigned char *buf, uint16_t);
 void log_title(const char *title);
 #endif

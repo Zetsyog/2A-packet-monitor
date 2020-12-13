@@ -1,8 +1,7 @@
 #include "logger.h"
 #include "parser.h"
-#include <netinet/if_ether.h>
 #include <arpa/inet.h>
-
+#include <netinet/if_ether.h>
 
 static void log_mac_addr(unsigned char *addr) {
 	log_format("%02x", addr[0]);
@@ -13,14 +12,19 @@ static void log_mac_addr(unsigned char *addr) {
 
 void parse_ethernet(const unsigned char *packet) {
 	struct ethhdr *hdr = (struct ethhdr *)packet;
-    unsigned short proto = ntohs(hdr->h_proto);
-    char *proto_str = "unsupported";
-	if(proto == ETH_P_IP) proto_str = "IPv4";
-	if(proto == ETH_P_IPV6) proto_str = "IPv6";
+	unsigned short proto = ntohs(hdr->h_proto);
+	char *proto_str = "unsupported";
+	if (proto == ETH_P_IP)
+		proto_str = "IPv4";
+	if (proto == ETH_P_IPV6)
+		proto_str = "IPv6";
 
-    BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 
-    set_offset(0);
+	set_offset(0);
 	log_title("Ethernet Header");
 
 	log_format("%-15s", "Source");
@@ -31,27 +35,29 @@ void parse_ethernet(const unsigned char *packet) {
 	log_mac_addr(hdr->h_dest);
 	log_formatln("");
 
-    log_formatln("%-15s%s", "Type", proto_str);
+	log_formatln("%-15s%s", "Type", proto_str);
 
-    END_LOG();
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 
-    BEGIN_LOG(SYNTH);
+	set_offset(0);
+	log_format("Ethernet, Src: ");
+	log_mac_addr(hdr->h_source);
+	log_format(" > Dst: ");
+	log_mac_addr(hdr->h_dest);
+	log_format("\n");
 
-    set_offset(0);
-    log_format("ETH ");
-    log_mac_addr(hdr->h_source);
-    log_format(" > ");
-    log_mac_addr(hdr->h_dest);
-    log_format("\n");
-
-    END_LOG();
-    
 	switch (proto) {
 	case ETH_P_IP:
-        parse_ip(packet + sizeof(struct ethhdr));
+		parse_ip(packet + sizeof(struct ethhdr));
 		break;
 	case ETH_P_IPV6:
 		parse_ipv6(packet + sizeof(struct ethhdr));
+		break;
+	case ETH_P_ARP:
+		parse_arp(packet + sizeof(struct ethhdr));
 		break;
 	default:
 		break;

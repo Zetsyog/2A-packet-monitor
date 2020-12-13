@@ -14,11 +14,13 @@ void parse_ip(const unsigned char *packet) {
 
 	uint32_t daddr = hdr->daddr, saddr = hdr->saddr;
 	uint16_t frag_off = ntohs(hdr->frag_off);
-    uint16_t tot_len = ntohs(hdr->tot_len);
+	uint16_t tot_len = ntohs(hdr->tot_len);
 	uint16_t ihl = hdr->ihl;
 
-	// Complete verbose display
-	BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 
 	set_offset(1);
 	log_title("IP header");
@@ -54,20 +56,27 @@ void parse_ip(const unsigned char *packet) {
 	log_addr(daddr);
 	log_format("\n");
 
-	END_LOG();
-
-	// Synth verbodse
-	BEGIN_LOG(SYNTH);
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 
 	set_offset(1);
 	log_offset();
-	log_format("IP ");
+	log_format("IPv4, Src: ");
 	log_addr(saddr);
-	log_format(" > ");
+	log_format(" > Dst: ");
 	log_addr(daddr);
 	log_format("\n");
 
-	END_LOG();
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format("IP Src: ");
+	log_addr(saddr);
+	log_format(", Dst: ");
+	log_addr(daddr);
 
 	switch (protocol) {
 	case TCP:

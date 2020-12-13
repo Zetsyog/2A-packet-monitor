@@ -8,6 +8,13 @@
 #include <arpa/inet.h>
 
 static int offset = 0;
+static enum LEVEL verbosity = 0, max_verbosity = 0;
+
+#define CHK_VERB() if(verbosity != max_verbosity) return;
+
+void set_max_verbosity(int level) {
+	max_verbosity = level;
+}
 
 void set_verbosity(int level) {
 	verbosity = level;
@@ -18,13 +25,15 @@ void set_offset(unsigned int i) {
 }
 
 void log_offset() {
-
+	CHK_VERB()
 	for (int i = 0; i < offset; i++) {
 		printf("\t");
 	}
 }
 
 void log_format(const char *message, ...) {
+
+	CHK_VERB()
 	va_list args;
 	va_start(args, message);
 	vprintf(message, args);
@@ -32,6 +41,8 @@ void log_format(const char *message, ...) {
 }
 
 void log_formatln(const char *message, ...) {
+	
+	CHK_VERB()
 	log_offset();
 
 	va_list args;
@@ -72,28 +83,34 @@ void log_addr6(struct in6_addr addr) {
 }
 
 void log_buf(const unsigned char *buf, uint16_t size) {
+	CHK_VERB();
+	fwrite(buf, size, 1, stdout);
+}
+
+void log_buf_offset(const unsigned char *buf, uint16_t size) {
+	CHK_VERB();
 	int write = 0;
 	log_offset();
 	for (int i = 0; i < size; i++) {
 		if(buf[i] == 0) break;
 		switch (buf[i]) {
 		case '\r':
-			printf("\\r");
+			log_format("\\r");
 			break;
 		case '\n':
-			printf("\\n\n");
+			log_format("\\n\n");
 			log_offset();
 			break;
 		default:
-			printf("%c", buf[i]);
+			log_format("%c", buf[i]);
 			break;
 		}
 		write++;
 	}
-	printf("\n");
+	log_format("\n");
 }
 
 void log_title(const char *title) {
-	printf(RESET);
+	log_format(RESET);
 	log_formatln("--- %s ---", title);
 }

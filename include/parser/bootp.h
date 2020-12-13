@@ -245,6 +245,7 @@ struct cmu_vend {
 #define PRINT_STR 1
 #define PRINT_IP 2
 #define PRINT_UINT_32 3
+#define PRINT_HEX 4
 struct {
 	char *name;
 	int displaytype;
@@ -327,9 +328,9 @@ struct {
 	[75] = {"StreetTalk Servers", PRINT_DEFAULT},
 	[76] = {"StreetTalk Directory Assistance (STDA) Servers", PRINT_DEFAULT},
 
-	[TAG_AGENT_CIRCUIT] = {"Agent Information Option", PRINT_DEFAULT},
+	[TAG_AGENT_CIRCUIT] = {"Agent Information Option", PRINT_HEX},
 
-	[TAG_AUTH] = {"Auth", PRINT_DEFAULT},
+	[TAG_AUTH] = {"Auth", PRINT_HEX},
 	[TAG_VINES_SERVERS] = {"Vines Servers", PRINT_DEFAULT},
 	[TAG_SERVER_RANK] = {"Server Rank", PRINT_DEFAULT},
 	[TAG_CLIENT_ARCH] = {"Client ARCH", PRINT_DEFAULT},

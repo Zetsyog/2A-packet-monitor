@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	set_verbosity(options.verbose_level);
+	set_max_verbosity(options.verbose_level);
 
 	if (options.exec_type == ONLINE) {
 		run_online();

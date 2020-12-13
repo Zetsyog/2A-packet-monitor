@@ -16,11 +16,11 @@ static int telnet_opt(const unsigned char *packet) {
 		packet += 2;
 		int i = 2;
 		while ((*packet) != IAC && (*(packet + 1)) != SE) {
-			log_format("%u ", (unsigned int) *packet);
+			log_format("%u ", (unsigned int)*packet);
 			i++;
 			packet++;
 		}
-		i+=2;
+		i += 2;
 		log_format("\n");
 		log_formatln("Suboption end (240)");
 		return i;
@@ -66,7 +66,10 @@ static void telnet_line(const unsigned char *packet, uint16_t size) {
 }
 
 void parse_telnet(const unsigned char *packet, uint16_t size) {
-	BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 
 	set_offset(3);
 	if (size) {
@@ -74,11 +77,11 @@ void parse_telnet(const unsigned char *packet, uint16_t size) {
 		telnet_line(packet, size);
 	}
 
-	END_LOG();
-
-	BEGIN_LOG(SYNTH);
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 	set_offset(3);
-	log_formatln("SMTP Size = %hu", size);
-
+	log_formatln("Telnet, size: %hu", size);
 	END_LOG();
 }

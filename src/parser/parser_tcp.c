@@ -10,13 +10,15 @@
 
 #define CHECK_PROTO(x) source == x || dest == x
 
-
 void parse_tcp(const unsigned char *packet, uint16_t size) {
 	struct tcphdr *hdr = (struct tcphdr *)packet;
 	uint16_t source = ntohs(hdr->source), dest = ntohs(hdr->dest),
 			 doff = hdr->doff;
 
-	BEGIN_LOG(COMPLETE);
+	/**
+	 * COMPLETE Verbosity
+	 */
+	set_verbosity(COMPLETE);
 
 	set_offset(2);
 	log_title("TCP Header");
@@ -47,26 +49,26 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 	log_formatln("%-15s0x%04x", "Checksum", ntohs(hdr->check));
 	log_formatln("%-15s%hu", "Urgent ptr", ntohs(hdr->urg_ptr));
 
-	END_LOG();
-
-	BEGIN_LOG(SYNTH);
+	/**
+	 * SYNTH Verbosity
+	 */
+	set_verbosity(SYNTH);
 
 	set_offset(2);
 	log_formatln("TCP %hu > %hu", source, dest);
 
-	END_LOG();
-
 	uint16_t payload_size = size - doff * 4;
 	const unsigned char *next = packet + doff * 4;
-	if(payload_size == 0) return;
-	
-	if(CHECK_PROTO(HTTP)) {
+	if (payload_size == 0)
+		return;
+
+	if (CHECK_PROTO(HTTP)) {
 		parse_http(next, payload_size);
-	} else if(CHECK_PROTO(SMTP)) {
+	} else if (CHECK_PROTO(SMTP)) {
 		parse_smtp(next, payload_size);
-	} else if(CHECK_PROTO(TELNET)) {
+	} else if (CHECK_PROTO(TELNET)) {
 		parse_telnet(next, payload_size);
-	} else if(CHECK_PROTO(FTP)) {
+	} else if (CHECK_PROTO(FTP)) {
 		parse_ftp(next, payload_size);
 	}
 }
