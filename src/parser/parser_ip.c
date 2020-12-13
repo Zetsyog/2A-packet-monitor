@@ -73,6 +73,7 @@ void parse_ip(const unsigned char *packet) {
 	 * CONCISE Verbosity
 	 */
 	set_verbosity(CONCISE);
+	
 	log_format("IP Src: ");
 	log_addr(saddr);
 	log_format(", Dst: ");

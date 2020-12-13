@@ -21,4 +21,10 @@ void parse_http(const unsigned char *packet, const uint16_t size) {
 	set_verbosity(SYNTH);
 	set_offset(3);
 	log_formatln("HTTP Size = %hu", size);
+
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", HTTP");
 }

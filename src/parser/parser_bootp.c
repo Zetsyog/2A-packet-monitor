@@ -122,9 +122,9 @@ void parse_bootp(const unsigned char *packet) {
 	 */
 	set_verbosity(CONCISE);
 	if (dhcp)
-		log_format("DHCP %s", dhcp_msg);
+		log_format(", DHCP %s", dhcp_msg);
 	else
-		log_format("Bootp");
+		log_format(", Bootp");
 
 	log_format("\n");
 }

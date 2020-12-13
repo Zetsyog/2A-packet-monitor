@@ -57,6 +57,12 @@ void parse_tcp(const unsigned char *packet, uint16_t size) {
 	set_offset(2);
 	log_formatln("TCP %hu > %hu", source, dest);
 
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", TCP (%u > %u)", source, dest);
+
 	uint16_t payload_size = size - doff * 4;
 	const unsigned char *next = packet + doff * 4;
 	if (payload_size == 0)

@@ -83,5 +83,10 @@ void parse_telnet(const unsigned char *packet, uint16_t size) {
 	set_verbosity(SYNTH);
 	set_offset(3);
 	log_formatln("Telnet, size: %hu", size);
-	END_LOG();
+
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", Telnet");
 }

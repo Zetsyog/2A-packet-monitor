@@ -32,6 +32,12 @@ void parse_udp(const unsigned char *packet) {
 	set_offset(2);
 	log_formatln("Udp, Src port: %hu > Dst port: %hu", source, dest);
 
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", UDP (%u > %u)", source, dest);
+
 	if (dest == BOOTP_CLIENT_PORT || source == BOOTP_SERVER_PORT) {
 		parse_bootp(packet + sizeof(struct udphdr));
 	} else if (dest == DNS_PORT || source == DNS_PORT) {

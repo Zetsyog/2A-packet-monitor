@@ -21,4 +21,10 @@ void parse_ftp(const unsigned char *packet, const uint16_t size) {
 	set_verbosity(SYNTH);
 	set_offset(3);
 	log_formatln("FTP Size = %hu", size);
+
+	/**
+	 * CONCISE Verbosity
+	 */
+	set_verbosity(CONCISE);
+	log_format(", FTP");
 }
